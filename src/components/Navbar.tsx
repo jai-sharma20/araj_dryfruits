@@ -41,8 +41,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange }) => {
           {/* Logo */}
           <div className="flex items-center cursor-pointer transform hover:scale-105 transition-transform duration-200" onClick={() => onPageChange('home')}>
             <img 
-              src="/src/assets/Untitled design (16).png" 
-              alt="Araj Dry Fruits & Spices" 
+              src="/images/logo.png" 
+              alt="Araj Dry Fruits & Spices - Premium Quality Dry Fruits and Indian Spices" 
               className="h-16 w-auto md:h-18 lg:h-20"
             />
           </div>
