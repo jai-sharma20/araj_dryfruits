@@ -1,5 +1,13 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { CartItem, Product } from '../types';
+import React, { createContext, useContext, useReducer } from 'react';
+
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  weight: string;
+}
 
 interface CartState {
   items: CartItem[];
@@ -7,12 +15,11 @@ interface CartState {
 }
 
 type CartAction =
-  | { type: 'ADD_TO_CART'; payload: Product }
-  | { type: 'REMOVE_FROM_CART'; payload: string }
+  | { type: 'ADD_ITEM'; payload: CartItem }
+  | { type: 'REMOVE_ITEM'; payload: string }
   | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
   | { type: 'CLEAR_CART' }
-  | { type: 'TOGGLE_CART' }
-  | { type: 'CLOSE_CART' };
+  | { type: 'TOGGLE_CART' };
 
 const initialState: CartState = {
   items: [],
@@ -21,68 +28,60 @@ const initialState: CartState = {
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
-    case 'ADD_TO_CART':
-      const existingItem = state.items.find(item => item.product.id === action.payload.id);
+    case 'ADD_ITEM': {
+      const existingItem = state.items.find(item => item.id === action.payload.id);
       if (existingItem) {
         return {
           ...state,
           items: state.items.map(item =>
-            item.product.id === action.payload.id
-              ? { ...item, quantity: item.quantity + 1 }
+            item.id === action.payload.id
+              ? { ...item, quantity: item.quantity + action.payload.quantity }
               : item
           ),
         };
       }
       return {
         ...state,
-        items: [...state.items, { product: action.payload, quantity: 1 }],
+        items: [...state.items, action.payload],
       };
-    
-    case 'REMOVE_FROM_CART':
+    }
+    case 'REMOVE_ITEM':
       return {
         ...state,
-        items: state.items.filter(item => item.product.id !== action.payload),
+        items: state.items.filter(item => item.id !== action.payload),
       };
-    
     case 'UPDATE_QUANTITY':
       return {
         ...state,
         items: state.items.map(item =>
-          item.product.id === action.payload.id
+          item.id === action.payload.id
             ? { ...item, quantity: action.payload.quantity }
             : item
-        ).filter(item => item.quantity > 0),
+        ),
       };
-    
     case 'CLEAR_CART':
       return {
         ...state,
         items: [],
       };
-    
     case 'TOGGLE_CART':
       return {
         ...state,
         isOpen: !state.isOpen,
       };
-    
-    case 'CLOSE_CART':
-      return {
-        ...state,
-        isOpen: false,
-      };
-    
     default:
       return state;
   }
 };
 
-const CartContext = createContext<{
+interface CartContextType {
   state: CartState;
   dispatch: React.Dispatch<CartAction>;
-} | null>(null);
+}
 
-export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+const CartContext = createContext<CartContextType | undefined>(undefined);
+
+export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
   return (

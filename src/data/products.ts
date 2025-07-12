@@ -452,17 +452,92 @@ export const products: Product[] = [
     rating: 4.6,
     reviews: 76,
   },
+  {
+    id: generateUniqueProductId('GFT'),
+    name: 'Premium Festive Gift Box',
+    price: 2499,
+    originalPrice: 2999,
+    category: 'Gift Packs',
+    image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Luxurious gift box containing premium almonds, cashews, pistachios, and selected spices.',
+    weight: '1kg',
+    nutritionalInfo: 'Assorted nutritional values',
+    inStock: true,
+    featured: true,
+    rating: 4.9,
+    reviews: 85,
+  },
+  {
+    id: generateUniqueProductId('GFT'),
+    name: 'Dry Fruit Celebration Pack',
+    price: 1999,
+    originalPrice: 2299,
+    category: 'Gift Packs',
+    image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Beautiful gift pack with assorted dry fruits perfect for celebrations.',
+    weight: '750g',
+    nutritionalInfo: 'Rich in proteins, vitamins, and minerals',
+    inStock: true,
+    featured: true,
+    rating: 4.8,
+    reviews: 67,
+  },
+  {
+    id: generateUniqueProductId('GFT'),
+    name: 'Spice Connoisseur Collection',
+    price: 1499,
+    originalPrice: 1799,
+    category: 'Gift Packs',
+    image: 'https://images.pexels.com/photos/4198014/pexels-photo-4198014.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Curated collection of premium whole spices in an elegant gift box.',
+    weight: '500g',
+    nutritionalInfo: 'Rich in natural oils and antioxidants',
+    inStock: true,
+    featured: true,
+    rating: 4.7,
+    reviews: 52,
+  },
+  {
+    id: generateUniqueProductId('GFT'),
+    name: 'Wellness Gift Hamper',
+    price: 3499,
+    originalPrice: 3999,
+    category: 'Gift Packs',
+    image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Luxury wellness hamper with organic dry fruits, nuts, and premium spices.',
+    weight: '1.5kg',
+    nutritionalInfo: 'Carefully selected for health benefits',
+    inStock: true,
+    featured: true,
+    rating: 4.9,
+    reviews: 43,
+  },
+  {
+    id: generateUniqueProductId('GFT'),
+    name: 'Traditional Favorites Box',
+    price: 1799,
+    originalPrice: 1999,
+    category: 'Gift Packs',
+    image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Classic collection of traditional Indian dry fruits and spices.',
+    weight: '800g',
+    nutritionalInfo: 'Rich in natural goodness',
+    inStock: true,
+    featured: false,
+    rating: 4.6,
+    reviews: 38,
+  },
 ];
 
 // Helper function to get the prefix based on category
 const getCategoryPrefix = (category: string): string => {
   switch (category) {
-    case 'nuts':
-      return 'NUT';
     case 'spices':
       return 'SPC';
     case 'dried-fruits':
       return 'DRF';
+    case 'Gift Packs':
+      return 'GFT';
     default:
       return 'PROD';
   }
@@ -470,7 +545,7 @@ const getCategoryPrefix = (category: string): string => {
 
 export const categories = [
   { id: 'all', name: 'All Products', count: products.length },
-  { id: 'nuts', name: 'Nuts', count: products.filter(p => p.category === 'nuts').length },
   { id: 'spices', name: 'Spices', count: products.filter(p => p.category === 'spices').length },
   { id: 'dried-fruits', name: 'Dried Fruits', count: products.filter(p => p.category === 'dried-fruits').length },
+  { id: 'Gift Packs', name: 'Gift Packs', count: products.filter(p => p.category === 'Gift Packs').length },
 ];

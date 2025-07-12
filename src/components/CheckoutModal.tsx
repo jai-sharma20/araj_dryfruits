@@ -1,6 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import CheckoutForm from './CheckoutForm';
+import { useCart } from '../context/CartContext';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -8,6 +9,8 @@ interface CheckoutModalProps {
 }
 
 const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
+  const { state } = useCart();
+  
   if (!isOpen) return null;
 
   return (
@@ -33,7 +36,41 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-            <CheckoutForm onSuccess={onClose} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Order Summary */}
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
+                <div className="space-y-4">
+                  {state.items.map((item) => (
+                    <div key={item.id} className="flex items-center space-x-4">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div className="flex-1">
+                        <h4 className="font-medium">{item.name}</h4>
+                        <p className="text-gray-600">Quantity: {item.quantity}</p>
+                        <p className="text-maroon-600">₹{(item.price * item.quantity).toFixed(2)}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="border-t pt-4 mt-4">
+                    <div className="flex justify-between font-semibold">
+                      <span>Total Amount:</span>
+                      <span className="text-maroon-600">
+                        ₹{state.items.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Checkout Form */}
+              <div>
+                <CheckoutForm onClose={onClose} />
+              </div>
+            </div>
           </div>
         </div>
       </div>

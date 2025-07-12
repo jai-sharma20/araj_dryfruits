@@ -1,6 +1,7 @@
 import React from 'react';
 import HeroSection from '../components/HeroSection';
 import FeaturedProducts from '../components/FeaturedProducts';
+import GiftingSection from '../components/GiftingSection';
 import AboutSection from '../components/AboutSection';
 import Testimonials from '../components/Testimonials';
 import AchievementsCarousel from '../components/AchievementsCarousel';
@@ -16,6 +17,7 @@ const HomePage: React.FC<HomePageProps> = ({ onShopNow, onExploreProducts, onVie
     <div>
       <HeroSection onShopNow={onShopNow} onExploreProducts={onExploreProducts} />
       <FeaturedProducts onViewAll={onViewAllProducts} />
+      <GiftingSection onViewAll={onViewAllProducts} />
       <AboutSection />
       <AchievementsCarousel />
       <Testimonials />

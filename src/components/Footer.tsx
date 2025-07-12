@@ -1,7 +1,11 @@
 import React from 'react';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  onPageChange: (page: string) => void;
+}
+
+const Footer: React.FC<FooterProps> = ({ onPageChange }) => {
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -62,15 +66,15 @@ const Footer: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <MapPin className="w-5 h-5 text-maroon-400" />
-                <span className="text-gray-400">123 Spice Street, Mumbai, India</span>
+                <span className="text-gray-400">11/48-E, Near Apsara Talkies, Hathras Road, Naraich, Agra-282006(U.P.)</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-maroon-400" />
-                <span className="text-gray-400">+91 98765 43210</span>
+                <span className="text-gray-400">+91 99171 04448</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-maroon-400" />
-                <span className="text-gray-400">info@arajspices.com</span>
+                <span className="text-gray-400">ankurkaushal0016@gmail.com</span>
               </div>
             </div>
           </div>
@@ -78,7 +82,20 @@ const Footer: React.FC = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            © 2024 Araj Dry Fruits & Spices. All rights reserved. | Privacy Policy | Terms of Service
+            © 2024 Araj Dry Fruits & Spices. All rights reserved. |{' '}
+            <button 
+              onClick={() => onPageChange('privacy')} 
+              className="text-gray-400 hover:text-maroon-400 transition-colors"
+            >
+              Privacy Policy
+            </button>{' '}
+            |{' '}
+            <button 
+              onClick={() => onPageChange('terms')} 
+              className="text-gray-400 hover:text-maroon-400 transition-colors"
+            >
+              Terms of Service
+            </button>
           </p>
         </div>
       </div>

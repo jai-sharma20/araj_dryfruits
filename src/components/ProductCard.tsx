@@ -1,7 +1,7 @@
 import React from 'react';
 import { Star, ShoppingCart, Heart, Eye } from 'lucide-react';
 import { Product } from '../types';
-import { useCart } from '../context/CartContext';
+import { useCart, CartItem } from '../context/CartContext';
 
 interface ProductCardProps {
   product: Product;
@@ -11,7 +11,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { dispatch } = useCart();
 
   const handleAddToCart = () => {
-    dispatch({ type: 'ADD_TO_CART', payload: product });
+    const cartItem: CartItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      image: product.image,
+      weight: product.weight
+    };
+    dispatch({ type: 'ADD_ITEM', payload: cartItem });
   };
 
   const discountPercentage = product.originalPrice 

@@ -6,8 +6,11 @@ import HomePage from './pages/HomePage';
 import ShopPage from './pages/ShopPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import LoadingScreen from './components/LoadingScreen';
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -38,6 +41,10 @@ function App() {
         return <AboutPage />;
       case 'contact':
         return <ContactPage />;
+      case 'privacy':
+        return <PrivacyPolicy />;
+      case 'terms':
+        return <TermsOfService />;
       default:
         return (
           <HomePage
@@ -50,17 +57,19 @@ function App() {
   };
 
   return (
-    <CartProvider>
-      <LoadingScreen isLoading={isLoading} />
-      <div className={`min-h-screen bg-gray-50 transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-        <Navbar currentPage={currentPage} onPageChange={setCurrentPage} />
-        <main>
-          {renderPage()}
-        </main>
-        <Footer />
-        <Cart />
-      </div>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <LoadingScreen isLoading={isLoading} />
+        <div className={`min-h-screen bg-gray-50 transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+          <Navbar currentPage={currentPage} onPageChange={setCurrentPage} />
+          <main>
+            {renderPage()}
+          </main>
+          <Footer onPageChange={setCurrentPage} />
+          <Cart />
+        </div>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 
