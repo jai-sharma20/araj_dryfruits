@@ -66,12 +66,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Sign in successful:', result.user.email);
     } catch (error: any) {
       console.error('Sign in error:', error);
-      if (error.code === 'auth/user-not-found') {
-        throw new Error('No account found with this email. Please sign up first.');
-      } else if (error.code === 'auth/wrong-password') {
-        throw new Error('Incorrect password. Please try again.');
+      if (error.code === 'auth/invalid-credentials') {
+        throw new Error('Invalid email or password. Please try again.');
       } else if (error.code === 'auth/invalid-email') {
         throw new Error('Please enter a valid email address.');
+      } else if (error.code === 'auth/too-many-requests') {
+        throw new Error('Too many failed attempts. Please try again later.');
       }
       throw new Error(error.message || 'Failed to sign in. Please try again.');
     }
@@ -81,22 +81,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
+      provider.addScope('profile');
+      provider.addScope('email');
       provider.setCustomParameters({
-        prompt: 'select_account'
+        prompt: 'select_account',
+        display: 'popup'
       });
 
       // Check if we're on a mobile device
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
       if (isMobile) {
         // Use redirect method for mobile
+        console.log('Using redirect for mobile device');
+        await setPersistence(auth, browserLocalPersistence);
         await signInWithRedirect(auth, provider);
       } else {
         // Use popup for desktop
-        await signInWithPopup(auth, provider);
+        console.log('Using popup for desktop device');
+        await setPersistence(auth, browserLocalPersistence);
+        const result = await signInWithPopup(auth, provider);
+        console.log('Google sign in successful:', result.user.email);
       }
     } catch (error: any) {
       console.error('Google sign in error:', error);
+      if (error.code === 'auth/popup-blocked') {
+        throw new Error('Sign in popup was blocked. Please allow popups or try again on mobile.');
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        throw new Error('Sign in was cancelled. Please try again.');
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        throw new Error('Another sign in attempt is in progress. Please wait.');
+      } else if (error.code === 'auth/network-request-failed') {
+        throw new Error('Network error. Please check your internet connection and try again.');
+      }
       throw new Error('Failed to sign in with Google. Please try again.');
     }
   };
@@ -127,12 +144,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
+        console.log('Checking for redirect result...');
         const result = await getRedirectResult(auth);
         if (result) {
           console.log('Redirect sign-in successful:', result.user.email);
+          // You might want to trigger a success callback here
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Redirect sign-in error:', error);
+        if (error.code === 'auth/credential-already-in-use') {
+          console.error('Account already exists with a different credential');
+        } else if (error.code === 'auth/operation-not-allowed') {
+          console.error('Google sign-in is not enabled');
+        } else if (error.code === 'auth/invalid-credential') {
+          console.error('Invalid Google sign-in credential');
+        }
+        // You might want to trigger an error callback here
       }
     };
 
@@ -141,6 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Set up auth state listener
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
       setCurrentUser(user);
       setLoading(false);
     });
