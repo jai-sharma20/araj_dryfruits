@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,73 +12,47 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const { signUp, signIn, signInWithGoogle, loading, currentUser } = useAuth();
-
-  useEffect(() => {
-    // Clear form when modal is opened/closed
-    if (!isOpen) {
-      setEmail('');
-      setPassword('');
-      setError('');
-      setSuccess('');
-      setIsSignUp(false);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    // Clear error when switching between sign in and sign up
-    setError('');
-    setSuccess('');
-  }, [isSignUp]);
-
-  useEffect(() => {
-    // Close modal if user is logged in
-    if (currentUser) {
-      setSuccess('Successfully signed in!');
-      setTimeout(() => {
-        onClose();
-      }, 1500);
-    }
-  }, [currentUser, onClose]);
+  const { signUp, signIn, signInWithGoogle, resetPassword } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
+    setLoading(true);
 
     try {
       if (isSignUp) {
         await signUp(email, password);
-        setSuccess('Account created successfully!');
       } else {
         await signIn(email, password);
-        setSuccess('Signed in successfully!');
       }
+      onClose();
     } catch (err) {
-      console.error('Auth error:', err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unexpected error occurred. Please try again.');
-      }
+      setError('Failed to ' + (isSignUp ? 'sign up' : 'sign in'));
+      console.error(err);
     }
+
+    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
     try {
-      setError('');
-      setSuccess('');
       await signInWithGoogle();
-      // Success message will be shown by the currentUser effect
+      onClose();
     } catch (err) {
-      console.error('Google sign in error:', err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Failed to sign in with Google. Please try again.');
-      }
+      setError('Failed to sign in with Google');
+      console.error(err);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      await resetPassword(email);
+      setError('Password reset email sent!');
+    } catch (err) {
+      setError('Failed to reset password');
+      console.error(err);
     }
   };
 
@@ -91,7 +65,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           onClick={onClose}
           className="absolute top-2 right-2 sm:top-4 sm:right-4 text-gray-500 hover:text-gray-700 p-2"
           aria-label="Close"
-          disabled={loading}
         >
           <X className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
@@ -103,12 +76,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded mb-4 text-sm sm:text-base">
             {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-3 py-2 sm:px-4 sm:py-3 rounded mb-4 text-sm sm:text-base">
-            {success}
           </div>
         )}
 
@@ -124,7 +91,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-maroon-500 focus:border-maroon-500 text-base"
               required
               autoComplete="email"
-              disabled={loading}
             />
           </div>
 
@@ -139,56 +105,45 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-maroon-500 focus:border-maroon-500 text-base"
               required
               autoComplete={isSignUp ? 'new-password' : 'current-password'}
-              disabled={loading}
-              minLength={6}
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-maroon-600 text-white py-2 px-4 rounded-lg hover:bg-maroon-700 transition-colors disabled:opacity-50 text-base font-semibold relative"
+            className="w-full bg-maroon-600 text-white py-2 px-4 rounded-lg hover:bg-maroon-700 transition-colors disabled:opacity-50 text-base font-semibold"
           >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
-                Please wait...
-              </div>
-            ) : (
-              isSignUp ? 'Sign Up' : 'Sign In'
-            )}
+            {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
           </button>
         </form>
 
         <div className="mt-4">
           <button
             onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center text-base disabled:opacity-50 relative"
+            className="w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center text-base"
           >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-gray-600 mr-2"></div>
-                Please wait...
-              </div>
-            ) : (
-              <>
-                <img
-                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                  alt="Google"
-                  className="w-5 h-5 sm:w-6 sm:h-6 mr-2"
-                />
-                Continue with Google
-              </>
-            )}
+            <img
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              alt="Google"
+              className="w-5 h-5 sm:w-6 sm:h-6 mr-2"
+            />
+            Continue with Google
           </button>
         </div>
+
+        {!isSignUp && (
+          <button
+            onClick={handleResetPassword}
+            className="mt-3 sm:mt-4 text-sm text-maroon-600 hover:text-maroon-700 w-full text-center"
+          >
+            Forgot Password?
+          </button>
+        )}
 
         <div className="mt-4 sm:mt-6 text-center">
           <button
             onClick={() => setIsSignUp(!isSignUp)}
-            disabled={loading}
-            className="text-sm sm:text-base text-maroon-600 hover:text-maroon-700 disabled:opacity-50"
+            className="text-sm sm:text-base text-maroon-600 hover:text-maroon-700"
           >
             {isSignUp
               ? 'Already have an account? Sign In'
