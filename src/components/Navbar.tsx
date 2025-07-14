@@ -99,7 +99,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange }) => {
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center cursor-pointer transform hover:scale-105 transition-transform duration-200" onClick={() => onPageChange('home')}>
               <img 
-                src="/public/images/logo.png" 
+                src="/images/logo.png" 
                 alt="Araj Logo" 
                 className="h-16 w-auto"
               />

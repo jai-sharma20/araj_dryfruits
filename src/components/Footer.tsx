@@ -13,7 +13,7 @@ const Footer: React.FC<FooterProps> = ({ onPageChange }) => {
           {/* Company Info */}
           <div>
             <img 
-              src="/src/assets/Untitled design (16).png" 
+              src="/images/logo.png" 
               alt="Araj Dry Fruits & Spices" 
               className="h-20 w-auto mb-4 transform hover:scale-105 transition-transform duration-200"
             />
